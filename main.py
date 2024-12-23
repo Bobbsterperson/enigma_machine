@@ -1,55 +1,69 @@
 from constants import *
 
+plugboard_mappings = {
+    'A': 'Z', 'Z': 'A',
+    'B': 'Y', 'Y': 'B',
+    'C': 'X', 'X': 'C',
+}
+
 class Enigma:
     def __init__(self, rotor1, rotor2, rotor3, reflector, plugboard):
-        self.rotor1 = rotor1
-        self.rotor2 = rotor2
-        self.rotor3 = rotor3
-        self.reflector = reflector
+        self.rotor1 = list(rotor1)
+        self.rotor2 = list(rotor2)
+        self.rotor3 = list(rotor3)
+        self.reflector = list(reflector)
         self.plugboard = plugboard
+        self.rotor_positions = [0, 0, 0]
 
-    def messaging(self, message=""):
-        message = input("Enter message: ").upper() 
-        print(message)
+    def messaging(self):
+        message = input("enter message: ").upper()
         return message
-    
-    def encrypt(self, message=""):
-        message = self.messaging() # alot of repeated steps with minor changes, might take it out in to a method that is called for each rotor
-        encrypted_rotor1 = []
-        for i in message:
-            if i.isalpha():
-                i = i.upper()
-                alpha_index = alphabet.index(i)
-                scram1_in = rotor1[alpha_index]
-                encrypted_rotor1.append(scram1_in)
-            else:
-                encrypted_rotor1.append(i)
-        encrypted_rotor2 = []
-        for j in encrypted_rotor1:
-            if j.isalpha():
-                scram1_index = alphabet.index(j)
-                scram1_out = self.rotor2[scram1_index]
-                encrypted_rotor2.append(scram1_out)
-            else:
-                encrypted_rotor2.append(j)
-        encrypted_rotor3 = []
-        for k in encrypted_rotor2:
-            if k.isalpha():
-                scram2_index = alphabet.index(k)
-                scram2_out = self.rotor3[scram2_index]
-                encrypted_rotor3.append(scram2_out)
-            else:
-                encrypted_rotor3.append(k)
-        print("".join(encrypted_rotor1))
-        print("".join(encrypted_rotor2))
-        print("".join(encrypted_rotor3))
 
-    def turn_rotor():
-        pass
+    def rotate_rotor(self, rotor, steps):
+        return rotor[steps:] + rotor[:steps]
 
-    def decrypt():
-        pass
+    def step_rotors(self):
+        self.rotor_positions[0] += 1
+        self.rotor1 = self.rotate_rotor(self.rotor1, 1)
+        if self.rotor_positions[0] == 26:
+            self.rotor_positions[0] = 0
+            self.rotor_positions[1] += 1
+            self.rotor2 = self.rotate_rotor(self.rotor2, 1)
+        if self.rotor_positions[1] == 26:
+            self.rotor_positions[1] = 0
+            self.rotor_positions[2] += 1
+            self.rotor3 = self.rotate_rotor(self.rotor3, 1)
+
+    def plugboard_swap(self, char):
+        return self.plugboard.get(char, char)
+
+    def encrypt(self):
+        message = self.messaging()
+        encrypted_message = []
+        for char in message:
+            if char.isalpha():
+                char = self.plugboard_swap(char)
+                print(f"char trough plugboard {char}")
+                char = self.rotor1[alphabet.index(char)]
+                print(f"char trough rotor1 {char}")
+                char = self.rotor2[alphabet.index(char)]
+                print(f"char trough rotor2 {char}")
+                char = self.rotor3[alphabet.index(char)]
+                print(f"char trough rotor3 {char}")
+                char = self.reflector[alphabet.index(char)]
+                print(f"char trough refector {char}")
+                char = alphabet[self.rotor3.index(char)]
+                print(f"char trough rev rotor3 {char}")
+                char = alphabet[self.rotor2.index(char)]
+                print(f"char trough rev rotor2 {char}")
+                char = alphabet[self.rotor1.index(char)]
+                print(f"char trough rev rotor1 {char}")
+                char = self.plugboard_swap(char)
+                print(f"char trough rev plugboard back {char}")
+                self.step_rotors()
+            encrypted_message.append(char)
+        print("".join(encrypted_message))
 
 if __name__ == "__main__":
-    enigma = Enigma(rotor1, rotor2, rotor3, reflector, plugboard)
-    message = enigma.encrypt()
+    enigma = Enigma(rotor1, rotor2, rotor3, reflector, plugboard_mappings)
+    enigma.encrypt()

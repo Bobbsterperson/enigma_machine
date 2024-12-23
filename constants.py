@@ -5,4 +5,4 @@ reflector = "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-plugboard = {}
+# plugboard = {}
