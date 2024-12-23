@@ -1,17 +1,20 @@
 from constants import alphabet
 
 class EnigmaMachine:
+
     def __init__(self, rotors, reflector, plugboard):
         self.rotors = rotors
         self.reflector = reflector
         self.plugboard = plugboard
         self.saved_state = None
+        self.previous_state = []
 
     def save_state(self):
         self.saved_state = {
             "rotors": [rotor.offset for rotor in self.rotors],
             "plugboard": self.plugboard.connections.copy(),
         }
+        # self.previous_state.append(self.saved_state)
 
     def load_state(self):
         if self.saved_state:

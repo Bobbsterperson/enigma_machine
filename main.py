@@ -13,6 +13,7 @@ if __name__ == "__main__":
     reflector = Reflector(ref)
     enigma = EnigmaMachine([rotor1, rotor2, rotor3], reflector, plugboard)
     while True:
+        # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         command = input("Enter command (set r1/r2/r3 pos | set plug a:z | null | save | res | m | dec | show | exit): ").strip().lower()
         print("------------------------------------------------------------------------------------------")
         if command.startswith("set r"):
@@ -24,12 +25,16 @@ if __name__ == "__main__":
                 rotor2.set_position(position)
             elif rotor_id == "r3":
                 rotor3.set_position(position)
+            enigma.previous_state.append(enigma.saved_state)
+            enigma.save_state()
             print(f"Set {rotor_id} to position {position}.")
 
         elif command.startswith("set plug"):
             _, plug_config = command.split(maxsplit=1)
             a, z = plug_config.split(":")
             plugboard.add_connection(a, z)
+            enigma.previous_state.append(enigma.saved_state)
+            enigma.save_state()
             print(f"set plugboard connection {a.upper()} <-> {z.upper()}.")
 
         elif command == "null":
@@ -47,6 +52,10 @@ if __name__ == "__main__":
         elif command == "show":
             print("current settings:")
             print(enigma.get_settings())
+            for i in range(len(enigma.previous_state)):
+                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print("------------------------------------------------------------------------------------------")
+                print(f"previous state {current_time} :{enigma.previous_state[i]}", end="\n")
 
         elif command == "m":
             enigma.save_state()
